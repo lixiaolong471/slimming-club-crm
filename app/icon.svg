@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- 背景圆形 -->
+  <circle cx="50" cy="50" r="45" fill="#10B981" opacity="0.1"/>
+  
+  <!-- 人物轮廓 - 减肥后的苗条身材 -->
+  <g transform="translate(50, 50)">
+    <!-- 头部 -->
+    <circle cx="0" cy="-20" r="8" fill="#10B981" stroke="#059669" stroke-width="2"/>
+    
+    <!-- 身体 - 苗条的曲线 -->
+    <path d="M -8,-12 Q -10,0 -6,15 L 6,15 Q 10,0 8,-12 Z" 
+          fill="#10B981" 
+          stroke="#059669" 
+          stroke-width="2"/>
+    
+    <!-- 手臂 -->
+    <line x1="-7" y1="-8" x2="-12" y2="5" 
+          stroke="#059669" 
+          stroke-width="2.5" 
+          stroke-linecap="round"/>
+    <line x1="7" y1="-8" x2="12" y2="5" 
+          stroke="#059669" 
+          stroke-width="2.5" 
+          stroke-linecap="round"/>
+    
+    <!-- 腿部 -->
+    <line x1="-4" y1="15" x2="-5" y2="30" 
+          stroke="#059669" 
+          stroke-width="2.5" 
+          stroke-linecap="round"/>
+    <line x1="4" y1="15" x2="5" y2="30" 
+          stroke="#059669" 
+          stroke-width="2.5" 
+          stroke-linecap="round"/>
+  </g>
+  
+  <!-- 测量尺带 - 环绕在腰部 -->
+  <ellipse cx="50" cy="52" rx="18" ry="6" 
+           fill="none" 
+           stroke="#F59E0B" 
+           stroke-width="2" 
+           stroke-dasharray="2,1"
+           opacity="0.8"/>
+  
+  <!-- 星星装饰 - 代表成功 -->
+  <g fill="#F59E0B" opacity="0.6">
+    <path d="M 20,25 L21,28 L24,28 L21.5,30 L22.5,33 L20,31 L17.5,33 L18.5,30 L16,28 L19,28 Z" />
+    <path d="M 80,25 L81,28 L84,28 L81.5,30 L82.5,33 L80,31 L77.5,33 L78.5,30 L76,28 L79,28 Z" />
+  </g>
+</svg>

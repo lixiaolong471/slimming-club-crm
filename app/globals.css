@@ -24,3 +24,37 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 修复输入框文字颜色太浅的问题 */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="password"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+select,
+textarea {
+  color: #1f2937 !important; /* gray-800 深灰色 */
+  background-color: white !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important; /* gray-400 浅灰色占位符 */
+}
+
+/* 确保选中的选项文字清晰 */
+select option {
+  color: #1f2937 !important;
+  background-color: white !important;
+}
+
+/* 禁用状态的输入框 */
+input:disabled,
+select:disabled,
+textarea:disabled {
+  color: #6b7280 !important; /* gray-500 */
+  background-color: #f3f4f6 !important; /* gray-100 */
+}
