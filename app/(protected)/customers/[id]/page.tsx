@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Weight, Plus, TrendingDown, Calendar, Activity, Target } from 'lucide-react';
+import { ArrowLeft, Weight, Plus, TrendingDown, Activity, Target } from 'lucide-react';
 import { Customer, WeightRecord, ConsumptionRecord } from '@/lib/types';
 import { format } from 'date-fns';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -31,6 +31,7 @@ export default function CustomerDetailPage() {
       fetchWeightRecords();
       fetchConsumptionRecords();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customerId]);
 
   const fetchCustomerData = async () => {

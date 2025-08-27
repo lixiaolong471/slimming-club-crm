@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     
     const customers = customerAPI.getAll();
     return NextResponse.json(customers);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch customers' }, { status: 500 });
   }
 }
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const customer = customerAPI.create(body);
     return NextResponse.json(customer, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to create customer' }, { status: 500 });
   }
 }

@@ -1,15 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
 import { 
-  TrendingUp, Users, DollarSign, Calendar, 
-  Download, Filter, Award, Target
+  TrendingUp, Users, DollarSign, 
+  Download, Award, UserCheck, Scale
 } from 'lucide-react';
-import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
+import { format, startOfMonth, endOfMonth } from 'date-fns';
+import {
+  RevenueData, ServiceTypeData, PaymentMethodData, CustomerStats,
+  TopCustomer, WeightProgress, MonthlySummary
+} from '@/lib/types';
+import EmptyState from '@/components/EmptyState';
 
 export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState<'revenue' | 'customer' | 'service' | 'summary'>('revenue');
@@ -18,19 +23,15 @@ export default function ReportsPage() {
     endDate: format(endOfMonth(new Date()), 'yyyy-MM-dd')
   });
   
-  const [revenueData, setRevenueData] = useState<any[]>([]);
-  const [serviceTypeData, setServiceTypeData] = useState<any[]>([]);
-  const [paymentMethodData, setPaymentMethodData] = useState<any[]>([]);
-  const [customerStatsData, setCustomerStatsData] = useState<any>({ gender: [], age: [] });
-  const [topCustomersData, setTopCustomersData] = useState<any[]>([]);
-  const [weightProgressData, setWeightProgressData] = useState<any[]>([]);
-  const [monthlySummaryData, setMonthlySummaryData] = useState<any[]>([]);
+  const [revenueData, setRevenueData] = useState<RevenueData[]>([]);
+  const [serviceTypeData, setServiceTypeData] = useState<ServiceTypeData[]>([]);
+  const [paymentMethodData, setPaymentMethodData] = useState<PaymentMethodData[]>([]);
+  const [customerStatsData, setCustomerStatsData] = useState<CustomerStats>({ gender: [], age: [] });
+  const [topCustomersData, setTopCustomersData] = useState<TopCustomer[]>([]);
+  const [weightProgressData, setWeightProgressData] = useState<WeightProgress[]>([]);
+  const [monthlySummaryData, setMonthlySummaryData] = useState<MonthlySummary[]>([]);
 
-  useEffect(() => {
-    fetchAllReports();
-  }, [dateRange]);
-
-  const fetchAllReports = async () => {
+  const fetchAllReports = useCallback(async () => {
     // 获取收入数据
     const revenueRes = await fetch(`/api/reports?type=revenue&startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`);
     const revenue = await revenueRes.json();
@@ -65,7 +66,11 @@ export default function ReportsPage() {
     const monthlyRes = await fetch('/api/reports?type=monthly-summary');
     const monthly = await monthlyRes.json();
     setMonthlySummaryData(monthly);
-  };
+  }, [dateRange]);
+
+  useEffect(() => {
+    fetchAllReports();
+  }, [fetchAllReports]);
 
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
 
@@ -74,11 +79,11 @@ export default function ReportsPage() {
   const totalTransactions = revenueData.reduce((sum, item) => sum + (item.count || 0), 0);
 
   // 导出CSV功能
-  const exportToCSV = (data: any[], filename: string) => {
+  const exportToCSV = (data: unknown[], filename: string) => {
     if (data.length === 0) return;
     
-    const headers = Object.keys(data[0]).join(',');
-    const rows = data.map(row => Object.values(row).join(','));
+    const headers = Object.keys(data[0] as Record<string, unknown>).join(',');
+    const rows = data.map(row => Object.values(row as Record<string, unknown>).join(','));
     const csv = [headers, ...rows].join('\n');
     
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -248,23 +253,31 @@ export default function ReportsPage() {
 
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-lg font-semibold text-gray-800 mb-4">TOP消费客户</h2>
-              <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                {topCustomersData.slice(0, 10).map((customer, index) => (
-                  <div key={customer.id} className="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
-                    <div className="flex items-center">
-                      <span className="text-sm font-medium text-gray-600 mr-3">#{index + 1}</span>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{customer.name}</p>
-                        <p className="text-xs text-gray-500">{customer.phone}</p>
+              {topCustomersData.length === 0 ? (
+                <EmptyState
+                  icon={UserCheck}
+                  title="暂无客户消费数据"
+                  description="当前时间段内没有客户消费记录"
+                />
+              ) : (
+                <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                  {topCustomersData.slice(0, 10).map((customer, index) => (
+                    <div key={customer.id} className="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
+                      <div className="flex items-center">
+                        <span className="text-sm font-medium text-gray-600 mr-3">#{index + 1}</span>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{customer.name}</p>
+                          <p className="text-xs text-gray-500">{customer.phone}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-gray-900">¥{customer.total_amount?.toFixed(2) || '0.00'}</p>
+                        <p className="text-xs text-gray-500">{customer.consumption_count || 0}次</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-bold text-gray-900">¥{customer.total_amount?.toFixed(2) || '0.00'}</p>
-                      <p className="text-xs text-gray-500">{customer.consumption_count || 0}次</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -288,7 +301,7 @@ export default function ReportsPage() {
                     fill="#8884d8"
                     dataKey="count"
                   >
-                    {customerStatsData.gender.map((entry: any, index: number) => (
+                    {customerStatsData.gender.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.gender === 'male' ? '#3B82F6' : '#EC4899'} />
                     ))}
                   </Pie>
@@ -313,53 +326,61 @@ export default function ReportsPage() {
 
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">减重进度榜</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">客户</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">初始体重</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">当前体重</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">目标体重</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">已减重</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">进度</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {weightProgressData.map((customer: any) => {
-                    const currentWeight = customer.current_weight || customer.initial_weight;
-                    const weightLoss = customer.initial_weight - currentWeight;
-                    const targetLoss = customer.initial_weight - customer.target_weight;
-                    const progress = targetLoss > 0 ? (weightLoss / targetLoss) * 100 : 0;
-                    
-                    return (
-                      <tr key={customer.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-2 text-sm text-gray-900">{customer.name}</td>
-                        <td className="px-4 py-2 text-sm text-gray-500">{customer.initial_weight} kg</td>
-                        <td className="px-4 py-2 text-sm text-gray-900 font-medium">{currentWeight} kg</td>
-                        <td className="px-4 py-2 text-sm text-gray-500">{customer.target_weight} kg</td>
-                        <td className="px-4 py-2 text-sm">
-                          <span className={weightLoss > 0 ? 'text-green-600' : 'text-gray-500'}>
-                            {weightLoss > 0 ? `-${weightLoss.toFixed(1)}` : '0'} kg
-                          </span>
-                        </td>
-                        <td className="px-4 py-2">
-                          <div className="flex items-center">
-                            <div className="w-24 bg-gray-200 rounded-full h-2 mr-2">
-                              <div
-                                className="bg-gradient-to-r from-blue-400 to-green-500 h-2 rounded-full"
-                                style={{ width: `${Math.min(progress, 100)}%` }}
-                              />
+            {weightProgressData.length === 0 ? (
+              <EmptyState
+                icon={Scale}
+                title="暂无减重进度数据"
+                description="还没有客户的体重跟踪记录"
+              />
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">客户</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">初始体重</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">当前体重</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">目标体重</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">已减重</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">进度</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {weightProgressData.map((customer) => {
+                      const currentWeight = customer.current_weight || customer.initial_weight;
+                      const weightLoss = customer.initial_weight - currentWeight;
+                      const targetLoss = customer.initial_weight - customer.target_weight;
+                      const progress = targetLoss > 0 ? (weightLoss / targetLoss) * 100 : 0;
+                      
+                      return (
+                        <tr key={customer.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-2 text-sm text-gray-900">{customer.name}</td>
+                          <td className="px-4 py-2 text-sm text-gray-500">{customer.initial_weight} kg</td>
+                          <td className="px-4 py-2 text-sm text-gray-900 font-medium">{currentWeight} kg</td>
+                          <td className="px-4 py-2 text-sm text-gray-500">{customer.target_weight} kg</td>
+                          <td className="px-4 py-2 text-sm">
+                            <span className={weightLoss > 0 ? 'text-green-600' : 'text-gray-500'}>
+                              {weightLoss > 0 ? `-${weightLoss.toFixed(1)}` : '0'} kg
+                            </span>
+                          </td>
+                          <td className="px-4 py-2">
+                            <div className="flex items-center">
+                              <div className="w-24 bg-gray-200 rounded-full h-2 mr-2">
+                                <div
+                                  className="bg-gradient-to-r from-blue-400 to-green-500 h-2 rounded-full"
+                                  style={{ width: `${Math.min(progress, 100)}%` }}
+                                />
+                              </div>
+                              <span className="text-xs text-gray-600">{progress.toFixed(0)}%</span>
                             </div>
-                            <span className="text-xs text-gray-600">{progress.toFixed(0)}%</span>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -396,7 +417,7 @@ export default function ReportsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {serviceTypeData.map((service: any) => {
+                  {serviceTypeData.map((service) => {
                     const percentage = totalRevenue > 0 ? (service.total / totalRevenue) * 100 : 0;
                     return (
                       <tr key={service.service_type} className="hover:bg-gray-50">
@@ -459,7 +480,7 @@ export default function ReportsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {monthlySummaryData.map((month: any) => (
+                  {monthlySummaryData.map((month) => (
                     <tr key={month.month} className="hover:bg-gray-50">
                       <td className="px-4 py-2 text-sm font-medium text-gray-900">{month.month}</td>
                       <td className="px-4 py-2 text-sm text-gray-500">{month.transaction_count}</td>

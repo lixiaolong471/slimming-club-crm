@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     
     const records = consumptionAPI.getAll();
     return NextResponse.json(records);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch consumption records' }, { status: 500 });
   }
 }
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const record = consumptionAPI.create(body);
     return NextResponse.json(record, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to create consumption record' }, { status: 500 });
   }
 }

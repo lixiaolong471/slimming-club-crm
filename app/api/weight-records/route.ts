@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     
     const records = weightAPI.getByCustomerId(parseInt(customerId));
     return NextResponse.json(records);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch weight records' }, { status: 500 });
   }
 }
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const record = weightAPI.create(body);
     return NextResponse.json(record, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to create weight record' }, { status: 500 });
   }
 }

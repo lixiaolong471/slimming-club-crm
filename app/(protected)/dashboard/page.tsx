@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Users, DollarSign, Calendar, TrendingUp } from 'lucide-react';
 import { DashboardStats } from '@/lib/types';
+import Link from 'next/link';
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats>({
@@ -78,12 +79,12 @@ export default function Dashboard() {
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">快速操作</h2>
           <div className="space-y-3">
-            <a href="/customers" className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <Link href="/customers" className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
               <div className="flex items-center">
                 <Users className="w-5 h-5 text-blue-500 mr-3" />
                 <span className="text-gray-700">添加新客户</span>
               </div>
-            </a>
+            </Link>
             <a href="/consumption" className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
               <div className="flex items-center">
                 <DollarSign className="w-5 h-5 text-green-500 mr-3" />

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Calendar, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Plus, Calendar, Clock, CheckCircle, XCircle, CalendarDays } from 'lucide-react';
 import { Appointment, Customer } from '@/lib/types';
 import { format } from 'date-fns';
+import EmptyState from '@/components/EmptyState';
 
 export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -139,7 +140,7 @@ export default function AppointmentsPage() {
     }
   };
 
-  const filteredAppointments = appointments.filter((apt: any) => {
+  const filteredAppointments = appointments.filter((apt: Appointment) => {
     if (filterStatus === 'all') return true;
     return apt.status === filterStatus;
   });
@@ -205,8 +206,24 @@ export default function AppointmentsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredAppointments.map((appointment: any) => (
+      {filteredAppointments.length === 0 ? (
+        <div className="bg-white rounded-lg shadow-md">
+          <EmptyState
+            icon={CalendarDays}
+            title="暂无预约记录"
+            description={filterStatus === 'all' ? "还没有任何预约安排，点击新建预约添加" : `没有${getStatusText(filterStatus)}的预约`}
+            action={filterStatus === 'all' ? {
+              label: "新建首个预约",
+              onClick: () => {
+                resetForm();
+                setShowModal(true);
+              }
+            } : undefined}
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredAppointments.map((appointment: Appointment) => (
           <div key={appointment.id} className="bg-white rounded-lg shadow-md p-6">
             <div className="flex justify-between items-start mb-4">
               <div>
@@ -268,9 +285,10 @@ export default function AppointmentsPage() {
                 </button>
               </div>
             )}
-          </div>
-        ))}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

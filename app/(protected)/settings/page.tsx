@@ -58,7 +58,7 @@ export default function SettingsPage() {
         setShowPasswordModal(false);
         setMessage('');
       }, 2000);
-    } catch (error) {
+    } catch {
       setError('网络错误，请稍后重试');
     }
   };

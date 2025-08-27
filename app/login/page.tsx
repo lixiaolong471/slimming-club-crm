@@ -1,11 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Lock, User } from 'lucide-react';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -38,7 +36,7 @@ export default function LoginPage() {
       
       // 跳转到仪表盘
       window.location.href = '/dashboard';
-    } catch (error) {
+    } catch {
       setError('网络错误，请稍后重试');
       setLoading(false);
     }

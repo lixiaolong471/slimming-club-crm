@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Search } from 'lucide-react';
-import { ConsumptionRecord, Customer } from '@/lib/types';
+import { Plus, CreditCard } from 'lucide-react';
+import { ConsumptionRecord, Customer, ServiceType } from '@/lib/types';
 import { format } from 'date-fns';
+import EmptyState from '@/components/EmptyState';
 
 export default function ConsumptionPage() {
   const [records, setRecords] = useState<ConsumptionRecord[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [serviceTypes, setServiceTypes] = useState<any[]>([]);
+  const [serviceTypes, setServiceTypes] = useState<ServiceType[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     customer_id: '',
@@ -118,19 +119,33 @@ export default function ConsumptionPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">客户姓名</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">服务类型</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">金额</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">支付方式</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">描述</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">消费时间</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {records.map((record: any) => (
+        {records.length === 0 ? (
+          <EmptyState
+            icon={CreditCard}
+            title="暂无消费记录"
+            description="还没有任何消费记录，点击添加消费记录开始记录"
+            action={{
+              label: "添加首条记录",
+              onClick: () => {
+                resetForm();
+                setShowModal(true);
+              }
+            }}
+          />
+        ) : (
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">客户姓名</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">服务类型</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">金额</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">支付方式</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">描述</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">消费时间</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {records.map((record: ConsumptionRecord) => (
               <tr key={record.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {record.customer_name || '-'}
@@ -144,10 +159,11 @@ export default function ConsumptionPage() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {format(new Date(record.created_at), 'yyyy-MM-dd HH:mm')}
                 </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {showModal && (

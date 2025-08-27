@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     
     const serviceTypes = serviceTypeAPI.getAll(activeOnly);
     return NextResponse.json(serviceTypes);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch service types' }, { status: 500 });
   }
 }
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const serviceType = serviceTypeAPI.create(body);
     return NextResponse.json(serviceType, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to create service type' }, { status: 500 });
   }
 }
